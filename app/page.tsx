@@ -1,21 +1,22 @@
 "use client";
 import { useDraw } from "@/hooks/useDraw";
 import { FC, useRef, useState } from "react";
+import { ChromePicker } from "react-color";
 
 interface pageProps {}
 
 const page: FC<pageProps> = ({}) => {
-  const { canvasRef, onMouseDown } = useDraw(drawLine);
+  const [color, setColor] = useState<string>("#000");
+  const { canvasRef, onMouseDown, clear } = useDraw(drawLine);
 
-  function drawLine({ ctx, currentPoint, prevPoint }: Draw) {
+  function drawLine({ prevPoint, currentPoint, ctx }: Draw) {
     const { x: currX, y: currY } = currentPoint;
-
-    const lineColor = "#0000";
-    const linewidth = 5;
+    const lineColor = color;
+    const lineWidth = 5;
 
     let startPoint = prevPoint ?? currentPoint;
     ctx.beginPath();
-    ctx.lineWidth = linewidth;
+    ctx.lineWidth = lineWidth;
     ctx.strokeStyle = lineColor;
     ctx.moveTo(startPoint.x, startPoint.y);
     ctx.lineTo(currX, currY);
@@ -24,11 +25,18 @@ const page: FC<pageProps> = ({}) => {
     ctx.fillStyle = lineColor;
     ctx.beginPath();
     ctx.arc(startPoint.x, startPoint.y, 2, 0, 2 * Math.PI);
+    ctx.fill();
   }
 
   return (
     <>
       <div className="w-screen h-screen bg-white flex justify-center items-center">
+        <div className="flex flex-col gap-10 pr-10">
+          <ChromePicker color={color} onChange={(e) => setColor(e.hex)} />
+          <button className="p-2 border border-black rounded-md">
+            Clear Art
+          </button>
+        </div>
         <canvas
           onMouseDown={onMouseDown}
           width={750}
